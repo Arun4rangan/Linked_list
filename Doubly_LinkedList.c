@@ -35,7 +35,13 @@ struct test {
 };
 
 // Funciton to create new node
-test* make_newnodes (struct test *ptr,int val, struct test *previous, char *letters);
+struct test* make_newnodes (struct test *ptr,int val, struct test *previous, char *letters);
+
+//Free all the memory used up by linked list 
+void delete_All_nodes(struct test *ptr);
+
+//Free all the memory used up by linked list 
+struct test* delete_specific_node(struct test *ptr, int value);
 
 // global declared stucture used to allocate memory 
 struct test first;
@@ -50,7 +56,7 @@ int main(){
 	struct test *head;
 	struct test *end;
 	struct test *previous;
-	struct test *A = (test*)malloc(sizeof(first));
+	struct test *A = (struct test*)malloc(sizeof(first));
 	
 	//Set values for head node 
 	head = A;
@@ -68,15 +74,13 @@ int main(){
 	// Set the last node memory to the end pointer
 	end = A; 
 	
-	// To print from the top down 
+	// Iteration Check : 
 	A = head;
-	
 	while(A!=NULL ){
 		printf("%d\n",A->value);
 		A = A->next;
 	}
 	
-	// To print from the end to start
 	A = end;
 	
 	while(A!=NULL){
@@ -84,12 +88,28 @@ int main(){
 		A = A->prev;
 	}
 	
+	A = head;
+	
+	A = delete_specific_node(A, 5);
+	
+	if(A != NULL){
+		end = A;
+	}
+	
+	A = end;
+	while(A!=NULL ){
+		printf("%d\n",A->value);
+		A = A->prev;
+	}
+	
+	return 0;
+	
 }
 
 //Make a new node function
-test* make_newnodes (struct test *ptr, int val, struct test *previous, char *letters){
+struct test* make_newnodes (struct test *ptr, int val, struct test *previous, char *letters){
 	// Allocate memory for the new node 
-	struct test *B = (test*)malloc(sizeof(first));
+	struct test *B = (struct test*)malloc(sizeof(first));
 	
 	// Append values 
 	ptr->next = B;
@@ -101,4 +121,45 @@ test* make_newnodes (struct test *ptr, int val, struct test *previous, char *let
 	
 	// Return the memory location of the new node
 	return B;
+}
+
+ // delete all the nodes from linked list 
+void delete_All_nodes(struct test *ptr){
+	struct test * ptr_2;
+	while (ptr != NULL){
+		ptr_2 = ptr->next;
+		ptr->next = NULL;
+		ptr->prev = NULL;
+		ptr->value = NULL;
+		free(ptr);
+		ptr = ptr_2;
+	}
+	 return;
+}
+
+
+// delete a specific node from the linked list
+struct test* delete_specific_node(struct test *ptr, int value){
+	while(ptr->next->value != value){
+		ptr= ptr->next;
+		//if the value dosen't exist within the linked list, function returns NULL;
+		if(ptr->next == NULL){
+			return NULL;
+		}
+	}
+	
+	// If node is the last node on linked list, it frees the node and sends the current pointer to append to end pointer
+	if(ptr->next->next == NULL){
+		free(ptr->next);
+		ptr->next =NULL;
+		return ptr;
+	}
+	
+	struct test * ptr_2 = ptr->next;
+	ptr->next = ptr->next->next;
+	free(ptr_2);
+	ptr_2 = ptr;
+	ptr= ptr->next;
+	ptr->prev = ptr_2;
+	return NULL;
 }
